@@ -358,6 +358,15 @@ namespace nfs5::game
     // Race HUD scaling.
     namespace hud
     {
+        // Last widget batch in the race HUD. The game restores the HUD camera after this call.
+        inline constexpr Site WIDGET_FLUSH_CALL = { 0x00425B81, "E8 AA 47 FF FF" };
+        inline constexpr Site SOLID_QUAD = { 0x00419F50, "83 EC 10 E8 A8 6E 00 00" };
+
+        // Player one's input packet at 5E99DC. The poller writes (right - left) / 4
+        // at 412F4B, or / 2 at 4133A2 with a binding modifier active.
+        inline constexpr GameAddr STEERING_COMMAND = 0x005E99DD;
+        inline constexpr GameAddr INPUT_MODIFIER = 0x005E95CC;
+
         enum class SizeAxis : std::uint8_t
         {
             WIDTH,

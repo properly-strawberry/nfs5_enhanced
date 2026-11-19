@@ -290,6 +290,38 @@ namespace nfs5
     }
 
 
+    void __cdecl HudScaling::FlushWithSteeringIndicator()
+    {
+        HudScaling & self = GetInstance();
+        const auto flush = reinterpret_cast<void (__cdecl *)()>(self.m_SteeringFlushPatch.GetOriginalTarget());
+        // Submit the game's batch first so our widget has the entire quad buffer.
+        flush();
+        const float width = static_cast<float>(self.m_Installed ? g_VirtualWidth : hook::Ref<int>( game::var::SCREEN_WIDTH ));
+        const float height = static_cast<float>(self.m_Installed ? g_VirtualHeight : hook::Ref<int>( game::var::SCREEN_HEIGHT ));
+        if (width <= 0 || height <= 0)
+            return;
+
+        const float center = width * 0.5f;
+        const float y = height - 28.0f;
+        const float half = std::min( 52.0f, width * 0.18f );
+        const float limit = hook::Ref<int>( game::hud::INPUT_MODIFIER ) ? 127.0f : 63.0f;
+        const float steer = static_cast<float>(hook::Ref<std::int8_t>( game::hud::STEERING_COMMAND ));
+        const float dot = center + half * std::clamp( steer / limit, -1.0f, 1.0f );
+        const auto rect = [](float l, float t, float r, float b, std::uint32_t color)
+        {
+            const float vertices[4][4] = { { l,t,0,1 }, { r,t,0,1 }, { r,b,0,1 }, { l,b,0,1 } };
+            using QueueQuad = void (__cdecl *)(const float (*)[4], std::uint32_t);
+            reinterpret_cast<QueueQuad>(game::hud::SOLID_QUAD.m_Address.Get())( vertices, color );
+        };
+        rect( center-half-7, y-9, center+half+7, y+9, 0xB820252A );
+        rect( center-half, y-1, center+half, y+1, 0xFFADB4BA );
+        for (float x : { center-half, center, center+half })
+            rect( x-1, y-5, x+1, y+5, 0xFFE8ECEF );
+        rect( dot-3, y-3, dot+3, y+3, 0xFFFFB400 );
+        flush();
+    }
+
+
     bool HudScaling::Install(
         const HudSettings & settings
     )
@@ -298,6 +330,16 @@ namespace nfs5
             return true;
 
         m_Settings = settings;
+        if (settings.m_SteeringIndicator)
+        {
+            const auto & site = game::hud::WIDGET_FLUSH_CALL;
+            const auto & quad = game::hud::SOLID_QUAD;
+            if (hook::MatchBytes( site.m_Address, site.m_Signature ) &&
+                hook::MatchBytes( quad.m_Address, quad.m_Signature ))
+                m_SteeringFlushPatch.Apply( "SteeringIndicator", site.m_Address, reinterpret_cast<void *>(&FlushWithSteeringIndicator) );
+            else
+                LOG_WARN( "Steering indicator HUD signatures do not match" );
+        }
 
         if (!settings.m_Enabled)
         {
@@ -411,6 +453,7 @@ namespace nfs5
 
     void HudScaling::Uninstall()
     {
+        m_SteeringFlushPatch.Restore();
         m_DigitalSpeedPatch.Restore();
         m_DigitalRpmPatch.Restore();
         LoadingScreen::GetInstance().Uninstall();
