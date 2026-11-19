@@ -36,6 +36,8 @@ namespace nfs5
         hook::CallSitePatch m_PreviewHeightPatch;
         hook::CallSitePatch m_DigitalSpeedPatch;
         hook::CallSitePatch m_DigitalRpmPatch;
+        hook::CallSitePatch m_SteeringFlushPatch;
+        static void __cdecl FlushWithSteeringIndicator();
 
         // Scale the game itself last gave each font, the HUD only sets it when it is not 1.
         std::unordered_map<void *, FontScale> m_GameFontScale;

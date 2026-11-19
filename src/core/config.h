@@ -122,6 +122,7 @@ namespace nfs5
         // Speedometer and tachometer set to analog show only the gauge, the game also
         // draws the digital value inside it.
         bool m_ExclusiveGaugeStyle = true;
+        bool m_SteeringIndicator = false;
 
         // Fit the race loading screen to the display height instead of a 640x480 box.
         bool m_ScaleLoadingScreen = true;

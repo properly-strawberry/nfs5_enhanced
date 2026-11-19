@@ -246,6 +246,7 @@ namespace nfs5
         s.m_Hud.m_ScaleMultiplier = std::clamp( ReadFloat( L"HudScaling", L"ScaleMultiplier", 1.0f ), 0.25f, 4.0f );
         s.m_Hud.m_MinimumScale = std::clamp( ReadFloat( L"HudScaling", L"MinimumScale", 1.0f ), 0.25f, 8.0f );
         s.m_Hud.m_ScaleText = ReadBool( L"HudScaling", L"ScaleText", true );
+        s.m_Hud.m_SteeringIndicator = ReadBool( L"HudScaling", L"SteeringIndicator", false );
         s.m_Hud.m_ExclusiveGaugeStyle = ReadBool( L"HudScaling", L"ExclusiveGaugeStyle", true );
         s.m_Hud.m_ScaleLoadingScreen = ReadBool( L"HudScaling", L"ScaleLoadingScreen", true );
         s.m_Hud.m_SmoothLoadingScreen = ReadBool( L"HudScaling", L"SmoothLoadingScreen", true );
