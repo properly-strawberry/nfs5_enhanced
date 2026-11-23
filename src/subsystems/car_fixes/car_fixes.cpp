@@ -755,11 +755,11 @@ namespace nfs5
         if (!m_Installed)
             return;
 
+        m_UsedCarGarageLimit.Restore();
+        m_NewCarGarageLimit.Restore();
         m_UsedCarCandidateHook.reset();
         m_UsedCarAdvanceHook.reset();
         m_UsedCarDisplayHook.reset();
-        m_UsedCarGarageLimit.Restore();
-        m_NewCarGarageLimit.Restore();
         m_UsedCarAgePatch.Restore();
         RestoreWetTireTable();
         m_SetupRideHeightPostHook.reset();
